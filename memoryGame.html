@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+
+
+    const CardFront = () => {
+
+        return(
+                <img src={'./vision.png'} style={{
+                    borderRadius: '5px',
+                    height:'100%',
+                    width: '100%',
+                    backfaceVisibility:'hidden',
+                    margin:'0px',
+                    position:'absolute'
+                }
+                }/>
+
+        )
+    }
+   const CardBack = ({imgBack}) => {
+        return(
+                <img src={imgBack} style={{
+                    borderRadius: '5px',
+                    height:'100%',
+                    width: '100%',
+                    backfaceVisibility:'hidden',
+                    transform: 'rotateY(180deg)',
+                    position:'absolute'
+
+                }
+                }/>
+        )
+
+    }
+
+
+    const CardTemplate = ({back, rotated, onClick}) => {
+
+
+        let rote=rotated ? '180' : '0'
+        return(
+            <div
+                style={{
+                    background:'none',
+                    borderRadius: '5px',
+                    height:'124px',
+                    width: '74px',
+                    border: 'black solid 8px',
+                    perspective: '1000px',
+                    margin:'auto auto',
+                    boxShadow: '0px 0px 10px rgba(255, 255, 255,0.2)',
+                    transformStyle: 'preserve-3d',
+                    transition: 'transform 1000ms',
+                    transform: 'rotateY('+rote+'deg)',
+                    cursor: 'pointer',
+                    position: 'relative'
+            }}
+                onClick={onClick}
+            >
+                <CardBack imgBack={back}/>
+                <CardFront/>
+
+
+            </div>
+
+        )
+    }
+    const CardRepository = ({setScore,setMov}) => {
+        var arrayImages = [
+            'cartas/Loteria-ElBorracho.jpg',
+            'cartas/Loteria-ElCatrin.jpg',
+            'cartas/Loteria-ElParaguas.jpg',
+            'cartas/Loteria-ElSoldado.jpg',
+            'cartas/Loteria-LaCorona.jpg',
+            'cartas/Loteria-LaDama.jpg',
+            'cartas/Loteria-LaLuna.jpg',
+            'cartas/Loteria-LaPera.jpg',
+            'cartas/Loteria-ElBorracho.jpg',
+            'cartas/Loteria-ElCatrin.jpg',
+            'cartas/Loteria-ElParaguas.jpg',
+            'cartas/Loteria-ElSoldado.jpg',
+            'cartas/Loteria-LaCorona.jpg',
+            'cartas/Loteria-LaDama.jpg',
+            'cartas/Loteria-LaLuna.jpg',
+            'cartas/Loteria-LaPera.jpg'
+        ]
+        const [roteded, setRoteded] = React.useState(Array(16).fill(false))
+        const randomIndex = (max) => {
+            return Math.floor(Math.random() * max);
+        };
+
+        const shuffledArray = arrayImages.slice();
+
+        shuffledArray.sort(() => {
+            return randomIndex(2) - 1;
+        });
+
+        const [rombo,setRombo] = React.useState([])
+
+        function changePoint(newRombo) {
+            console.log(newRombo)
+
+            if(newRombo.length >1){
+                setMov()
+                if (imgsa[newRombo[0]] === imgsa[newRombo[1]]){
+                    setScore()
+                }else {
+                    setTimeout(()=>{setRoteded(prevState => {
+                        const newRoteded = [...prevState]
+                        newRoteded[newRombo[1]] = !newRoteded[newRombo[1]]
+                        newRoteded[newRombo[0]] = !newRoteded[newRombo[0]]
+                        return newRoteded
+                    })},1000)
+                }
+                setRombo([])
+            }
+
+        }
+
+
+
+
+
+        const [imgsa, setImgsa] = React.useState([...shuffledArray])
+        const clickeable =(index)=>{
+
+            if(roteded[index] !==true){
+
+                setRoteded(prevState => {
+                    const newRoteded = [...prevState]
+                    newRoteded[index] = !newRoteded[index]
+                    return newRoteded
+                })
+                setRombo(prevState=>{
+                        const newRombo = [...prevState]
+                        newRombo.push(index)
+                        changePoint(newRombo)
+                        return newRombo
+                    }
+                )
+
+
+            }
+
+
+
+        }
+
+
+        return(
+            <div
+                style={{
+                    width: '720px',
+                    heigth:'680px',
+                    margin: 'auto',
+                    display: 'grid',
+                    gridTemplateRows: 'repeat(4, 170px)',
+                    gridTemplateColumns: 'repeat(4, 180px)'
+
+                }}
+
+            >
+                {imgsa.map((item, index) => (
+                    <CardTemplate key={index} back={item} onClick={() => clickeable(index)} rotated={roteded[index]}/>
+                ))}
+
+            </div>
+        )
+    }
+
+    const PantallaWin = ({contraste, zIndex})=>{
+
+
+        return(
+            <div
+            style={{
+                opacity: contraste,
+                color:'white',
+                backgroundColor: 'black',
+                fontFamily: "Arial Narrow",
+                position:'absolute',
+                zIndex:zIndex,
+                left:0,
+                top:0,
+                right:0,
+                bottom:0,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                fontSize: '100px',
+                transition: 'opacity 500ms ease-in-out'
+            }}
+            >
+                You WIN
+            </div>
+        )
+    }
+
+
+    const Game = () => {
+        const [points,setPoints] = React.useState(0)
+        const [contraste, setContraste] = React.useState('0')
+        const [zIndex, setZIndex] = React.useState(0)
+        const [mov,setMov] = React.useState(0)
+
+        const cambiarPunteo = () => {
+            setPoints(prevState=> {
+                if((prevState+1)>=8){
+                    setTimeout(()=>{setContraste('50')}, 1000)
+                    setTimeout(()=>{setZIndex(2)}, 1000)
+                    setZIndex(2)
+                }
+                return prevState+1
+                }
+            )
+
+        }
+
+
+        return (
+            <div
+
+                style={{
+                    width: '100%',
+                    height:'100%',
+                    background: 'linear-gradient(27deg, #151515 5px, transparent 5px) 0 5px, linear-gradient(207deg, #151515 5px, transparent 5px) 10px 0px, linear-gradient(27deg, #222 5px, transparent 5px) 0px 10px, linear-gradient(207deg, #222 5px, transparent 5px) 10px 5px, linear-gradient(90deg, #1b1b1b 10px, transparent 10px), linear-gradient(#1d1d1d 25%, #1a1a1a 25%, #1a1a1a 50%, transparent 50%, transparent 75%, #242424 75%, #242424)',
+                    backgroundColor:'#131313',
+                    backgroundSize:'20px 20px',
+                    margin:'0px, 0px',
+                    pading:'0px'
+                }}
+            >
+
+
+                <div style={{
+                    position: 'relative',
+                    zIndex:1
+                }}>
+                    <div>
+                        <h1 style={{
+                            fontFamily: "Arial Narrow",
+                            color: 'white'
+                        }}>Score: {points}</h1>
+                        <h1 style={{
+                            fontFamily: "Arial Narrow",
+                            color: 'white'
+                        }}>Movimientos: {mov}</h1>
+                    </div>
+
+                    <CardRepository setScore={()=>{cambiarPunteo()}} setMov = {()=>setMov(mov+1)}/>
+                </div>
+                <PantallaWin contraste={contraste} zIndex={zIndex}></PantallaWin>
+
+
+
+            </div>
+        )
+    }
+
+
+
+    const root = ReactDOM.createRoot(document.getElementById('root'))
+    document.body.style.margin='0px'
+    document.body.style.marginTop ='-22px'
+    root.render(<Game />)
+
+</script>
+</body>
+</html>
