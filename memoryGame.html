@@ -106,15 +106,16 @@
 
         const [rombo,setRombo] = React.useState([])
 
-        function changePoint(newRombo) {
+        const changePoint =(newRombo) =>{
             console.log(newRombo)
 
             if(newRombo.length >1){
                 setMov()
-                if (imgsa[newRombo[0]] === imgsa[newRombo[1]]){
+                if (imgsa.current[newRombo[0]] === imgsa.current[newRombo[1]]){
                     setScore()
                 }else {
-                    setTimeout(()=>{setRoteded(prevState => {
+                    setTimeout(()=>{
+                        setRoteded(prevState => {
                         const newRoteded = [...prevState]
                         newRoteded[newRombo[1]] = !newRoteded[newRombo[1]]
                         newRoteded[newRombo[0]] = !newRoteded[newRombo[0]]
@@ -130,7 +131,7 @@
 
 
 
-        const [imgsa, setImgsa] = React.useState([...shuffledArray])
+        const imgsa = React.useRef([...shuffledArray])
         const clickeable =(index)=>{
 
             if(roteded[index] !==true){
@@ -169,7 +170,7 @@
                 }}
 
             >
-                {imgsa.map((item, index) => (
+                {imgsa.current.map((item, index) => (
                     <CardTemplate key={index} back={item} onClick={() => clickeable(index)} rotated={roteded[index]}/>
                 ))}
 
@@ -189,6 +190,7 @@
                 fontFamily: "Arial Narrow",
                 position:'absolute',
                 zIndex:zIndex,
+                height: "100%",
                 left:0,
                 top:0,
                 right:0,
@@ -200,7 +202,8 @@
                 transition: 'opacity 500ms ease-in-out'
             }}
             >
-                You WIN
+                <p>Has ganado</p>
+                <button onClick={()=>{location. reload()}}>Refresh</button>
             </div>
         )
     }
@@ -240,21 +243,28 @@
                 }}
             >
 
-
+                <div
+                    style={{
+                        position: 'relative',
+                        zIndex:3
+                    }}
+                >
+                    <h1 style={{
+                        fontFamily: "Arial Narrow",
+                        color: 'white'
+                    }}>Score: {points}</h1>
+                    <h1 style={{
+                        fontFamily: "Arial Narrow",
+                        color: 'white',
+                        position:'relative',
+                        zIndex:3
+                    }}>Movimientos: {mov}</h1>
+                </div>
                 <div style={{
                     position: 'relative',
                     zIndex:1
                 }}>
-                    <div>
-                        <h1 style={{
-                            fontFamily: "Arial Narrow",
-                            color: 'white'
-                        }}>Score: {points}</h1>
-                        <h1 style={{
-                            fontFamily: "Arial Narrow",
-                            color: 'white'
-                        }}>Movimientos: {mov}</h1>
-                    </div>
+
 
                     <CardRepository setScore={()=>{cambiarPunteo()}} setMov = {()=>setMov(mov+1)}/>
                 </div>
